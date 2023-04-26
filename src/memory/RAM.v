@@ -15,8 +15,7 @@ module RAM (
     end
 
     initial begin
-        for (integer i = 10; i < 2048; i = i + 1) ram[i] <= 0;
-        $readmemh("tests/PipelineForwarding/test.ram.hex", ram);
+        for (integer i = 0; i < 2048; i = i + 1) ram[i] <= 0;
     end
 
     always @(posedge clk) begin

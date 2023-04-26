@@ -15,12 +15,12 @@ module MuxPC(
     always @(*) begin
         if (branch) begin
             if (b_type) begin
-                if (alu_res == 32'b0)   out <= I3;
+                if (alu_res == 32'b0)   out <= I2;
                 else                    out <= I0;
             end
             else begin
                 if (alu_res == 32'b0)   out <= I0;
-                else                    out <= I3;
+                else                    out <= I2;
             end
         end
         else begin

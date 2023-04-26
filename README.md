@@ -12,7 +12,7 @@
 - [x] extra：单周期 CPU with 特权指令/异常处理
 - [x] 系统 Ⅱ lab1：流水线 CPU (stall)
 - [x] 系统 Ⅱ lab2：流水线 CPU (forwarding)
-- [ ] 系统 Ⅱ lab7：流水线 CPU with 特权指令/异常处理
+- [x] 系统 Ⅱ lab7：流水线 CPU with 特权指令/异常处理
 - [ ] 系统 Ⅲ lab1：流水线 CPU with 动态分支预测
 - [ ] 系统 Ⅲ lab2：流水线 CPU with Cache
 
