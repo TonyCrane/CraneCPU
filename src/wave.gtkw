@@ -1,11 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Wed Apr 26 13:20:38 2023
 [*]
 [timestart] 0
 [size] 1792 998
-[pos] -1 -1
-*-15.660110 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 0 320
+*-17.303963 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] CoreSim.
 [treeopen] CoreSim.core.
 [treeopen] CoreSim.core.cpu.
@@ -21,6 +20,15 @@ CoreSim.core.cpu.rst
 CoreSim.core.cpu.pc_out[31:0]
 CoreSim.core.cpu.inst[31:0]
 @800200
+-DataHazard
+@28
+CoreSim.core.cpu.stallunit.bubble_stop
+CoreSim.core.cpu.forwarding.ForwardA[2:0]
+CoreSim.core.cpu.forwarding.ForwardB[2:0]
+CoreSim.core.cpu.forwarding.ForwardC[1:0]
+@1000200
+-DataHazard
+@c00200
 -registers
 @c00024
 CoreSim.core.cpu.regs.\register[1][31:0]
@@ -59,9 +67,8 @@ CoreSim.core.cpu.regs.\register[1][31:0]
 (31)CoreSim.core.cpu.regs.\register[1][31:0]
 @1401200
 -group_end
-@25
-CoreSim.core.cpu.regs.\register[2][31:0]
 @24
+CoreSim.core.cpu.regs.\register[2][31:0]
 CoreSim.core.cpu.regs.\register[3][31:0]
 CoreSim.core.cpu.regs.\register[4][31:0]
 CoreSim.core.cpu.regs.\register[5][31:0]
@@ -91,22 +98,23 @@ CoreSim.core.cpu.regs.\register[28][31:0]
 CoreSim.core.cpu.regs.\register[29][31:0]
 CoreSim.core.cpu.regs.\register[30][31:0]
 CoreSim.core.cpu.regs.\register[31][31:0]
-@1000200
+@1401200
 -registers
-@c00200
+@800200
 -RAM
 @22
 CoreSim.core.ram_unit.\ram[0][31:0]
 CoreSim.core.ram_unit.\ram[1][31:0]
 CoreSim.core.ram_unit.\ram[2][31:0]
-CoreSim.core.ram_unit.\ram[36][31:0]
-CoreSim.core.ram_unit.\ram[37][31:0]
-CoreSim.core.ram_unit.\ram[38][31:0]
-CoreSim.core.ram_unit.\ram[39][31:0]
-CoreSim.core.ram_unit.\ram[256][31:0]
-CoreSim.core.ram_unit.\ram[257][31:0]
-CoreSim.core.ram_unit.\ram[258][31:0]
-@1401200
+CoreSim.core.ram_unit.\ram[3][31:0]
+CoreSim.core.ram_unit.\ram[4][31:0]
+CoreSim.core.ram_unit.\ram[5][31:0]
+CoreSim.core.ram_unit.\ram[6][31:0]
+CoreSim.core.ram_unit.\ram[7][31:0]
+CoreSim.core.ram_unit.\ram[8][31:0]
+CoreSim.core.ram_unit.\ram[9][31:0]
+CoreSim.core.ram_unit.\ram[10][31:0]
+@1000200
 -RAM
 [pattern_trace] 1
 [pattern_trace] 0

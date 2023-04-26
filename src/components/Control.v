@@ -12,7 +12,9 @@ module Control (
     output reg          mem_write,  // write RAM or not
     output reg          branch,     // is branch or not
     output reg          b_type,     // 1 -> beq, 0 -> bne
-    output reg          auipc       // is auipc or not
+    output reg          auipc,      // is auipc or not
+    output reg          mem_read,
+    output reg          jump
 );
     `include "AluOp.vh"
     always @(*) begin
@@ -25,11 +27,13 @@ module Control (
         branch      = 0;
         b_type      = 0;
         auipc       = 0;
+        mem_read    = 0;
+        jump        = 0;
 
         case (op_code)
             7'b0000011: begin   // lw
                 reg_write = 1;  alu_src_b = 1;  alu_op = ADD;
-                mem_to_reg = 2'b11;
+                mem_to_reg = 2'b11;             mem_read = 1;
             end
             7'b0100011: begin   // sw
                 alu_src_b = 1;  alu_op = ADD;   mem_write = 1;
@@ -51,9 +55,11 @@ module Control (
             end
             7'b1100011: begin   // bne beq
                 alu_op = XOR;   branch = 1; b_type = ~funct3[0];
+                jump = 1;
             end
             7'b1101111: begin   // jal
-                pc_src = 2'b10; reg_write = 1;  mem_to_reg = 2'b10;
+                pc_src = 2'b10; reg_write = 1;  mem_to_reg = 2'b10; 
+                jump = 1;
             end
             7'b0110111: begin   // lui
                 reg_write = 1;  mem_to_reg = 2'b01;
@@ -67,7 +73,7 @@ module Control (
             end
             7'b1100111: begin   // jalr
                 pc_src = 2'b01; reg_write = 1; mem_to_reg = 2'b10;
-                alu_src_b = 1;
+                alu_src_b = 1;  jump = 1;
             end
         endcase
     end

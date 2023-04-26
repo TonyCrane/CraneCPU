@@ -7,7 +7,7 @@ module ROM (
     reg [31:0] rom [0:2047];
 
     initial begin
-        $readmemh("tests/PipelineStall/test.hex", rom);
+        $readmemh("tests/PipelineForwarding/test.hex", rom);
     end
 
     assign out = rom[address];

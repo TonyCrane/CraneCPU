@@ -11,7 +11,7 @@
 - [x] 系统 Ⅰ lab5-1/lab5-2：单周期 CPU
 - [x] extra：单周期 CPU with 特权指令/异常处理
 - [x] 系统 Ⅱ lab1：流水线 CPU (stall)
-- [ ] 系统 Ⅱ lab2：流水线 CPU (forwarding)
+- [x] 系统 Ⅱ lab2：流水线 CPU (forwarding)
 - [ ] 系统 Ⅱ lab7：流水线 CPU with 特权指令/异常处理
 - [ ] 系统 Ⅲ lab1：流水线 CPU with 动态分支预测
 - [ ] 系统 Ⅲ lab2：流水线 CPU with Cache

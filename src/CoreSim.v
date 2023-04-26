@@ -12,7 +12,7 @@ module CoreSim;
 
     initial begin
         $dumpvars(0, CoreSim);
-        #320 $finish;
+        #1000 $finish;
     end
 
     initial begin
