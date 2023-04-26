@@ -13,8 +13,11 @@
 - [x] 系统 Ⅱ lab1：流水线 CPU (stall)
 - [x] 系统 Ⅱ lab2：流水线 CPU (forwarding)
 - [x] 系统 Ⅱ lab7：流水线 CPU with 特权指令/异常处理
-- [ ] 系统 Ⅲ lab1：流水线 CPU with 动态分支预测
-- [ ] 系统 Ⅲ lab2：流水线 CPU with Cache
+    - **Note**: 实际上这个 lab 做的比较不完善，只实现了 csrr 和 csrw 能跑，特权级基本功能还不全，有待改进
+- [x] 系统 Ⅲ lab1：流水线 CPU with 动态分支预测
+    - 使用了提供的实验框架而非自己的，就不放在 repo 里了
+- [x] 系统 Ⅲ lab2：流水线 CPU with Cache
+    - 使用了提供的实验框架而非自己的，就不放在 repo 里了
 
 ## 实验环境
 
