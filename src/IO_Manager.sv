@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2021/05/28 18:16:05
-// Design Name: 
-// Module Name: IO_Manager
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module IO_Manager(
         input  logic        clk,
@@ -30,7 +10,6 @@ module IO_Manager(
     output logic [31:0] data_in,
     output logic        aresetn,
     output logic        step,
-    output logic [31:0] chip_debug_in,
     
     // to gpio
     input  logic [15:0] switch,
@@ -78,9 +57,6 @@ module IO_Manager(
             button_last <=  32'b0;
         end
     end
-
-    // chip_debug_in
-    assign chip_debug_in = {21'b0,switch[10:0]};
 
     // Reset
 

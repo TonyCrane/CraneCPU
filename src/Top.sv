@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2021/05/28 18:16:36
-// Design Name: 
-// Module Name: Top
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module Top(
     input          clk,
@@ -35,11 +15,6 @@ module Top(
     logic aresetn;
     logic step;
 
-    logic [31:0] address;
-    logic [31:0] data_out;
-    logic [31:0] data_in;
-
-    logic [31:0] chip_debug_in;
     logic [31:0] chip_debug_out0;
     logic [31:0] chip_debug_out1;
     logic [31:0] chip_debug_out2;
@@ -50,11 +25,7 @@ module Top(
         .aresetn(aresetn),
         .step(step),
         .debug_mode(switch[15]),
-        // .debug_reg_addr(switch[11:7]),
-        .address(address),
-        .data_out(data_out),
-        .data_in(data_in),
-        .chip_debug_in(chip_debug_in),
+        .debug_reg_addr(switch[11:7]),
         .chip_debug_out0(chip_debug_out0),
         .chip_debug_out1(chip_debug_out1),
         .chip_debug_out2(chip_debug_out2),
@@ -68,10 +39,6 @@ module Top(
         // to chip
         .aresetn(aresetn),
         .step(step),
-        .address(address),
-        .data_out(data_out),
-        .data_in(data_in),
-        .chip_debug_in(chip_debug_in),
         
         // to gpio
         .switch(switch),
