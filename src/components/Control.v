@@ -67,7 +67,7 @@ module Control (
             end
             7'b1100111: begin   // jalr
                 pc_src = 2'b01; reg_write = 1; mem_to_reg = 2'b10;
-                alu_src_b = 1;  alu_op = ADD;
+                alu_src_b = 1;
             end
         endcase
     end

@@ -18,7 +18,7 @@ module Core (
     
     assign rst = ~aresetn;
 
-    SCPU cpu(
+    CPU cpu(
         .clk(cpu_clk),
         .rst(rst),
         .inst(inst),
