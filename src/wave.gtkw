@@ -1,0 +1,123 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Wed Apr 26 12:56:40 2023
+[*]
+[timestart] 0
+[size] 1792 998
+[pos] -1 -1
+*-26.326330 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] CoreSim.
+[treeopen] CoreSim.core.
+[treeopen] CoreSim.core.cpu.
+[treeopen] CoreSim.core.cpu.datapath.
+[treeopen] CoreSim.core.cpu.datapath.csr.
+[treeopen] CoreSim.core.ram_unit.
+[sst_width] 244
+[signals_width] 260
+[sst_expanded] 1
+[sst_vpaned_height] 308
+@28
+CoreSim.core.cpu.clk
+CoreSim.core.cpu.rst
+@22
+CoreSim.core.cpu.pc_out[31:0]
+CoreSim.core.cpu.inst[31:0]
+@800200
+-CSR
+@22
+CoreSim.core.cpu.datapath.csr.mstatus[31:0]
+CoreSim.core.cpu.datapath.csr.mepc[31:0]
+CoreSim.core.cpu.datapath.csr.mtvec[31:0]
+@24
+CoreSim.core.cpu.datapath.csr.mcause[31:0]
+@1000200
+-CSR
+@800200
+-registers
+@c00025
+CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+@28
+(0)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(1)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(2)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(3)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(4)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(5)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(6)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(7)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(8)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(9)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(10)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(11)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(12)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(13)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(14)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(15)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(16)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(17)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(18)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(19)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(20)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(21)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(22)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(23)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(24)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(25)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(26)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(27)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(28)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(29)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(30)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+(31)CoreSim.core.cpu.datapath.regs.\register[1][31:0]
+@1401201
+-group_end
+@24
+CoreSim.core.cpu.datapath.regs.\register[2][31:0]
+CoreSim.core.cpu.datapath.regs.\register[3][31:0]
+CoreSim.core.cpu.datapath.regs.\register[4][31:0]
+CoreSim.core.cpu.datapath.regs.\register[5][31:0]
+CoreSim.core.cpu.datapath.regs.\register[6][31:0]
+CoreSim.core.cpu.datapath.regs.\register[7][31:0]
+CoreSim.core.cpu.datapath.regs.\register[8][31:0]
+CoreSim.core.cpu.datapath.regs.\register[9][31:0]
+CoreSim.core.cpu.datapath.regs.\register[10][31:0]
+CoreSim.core.cpu.datapath.regs.\register[11][31:0]
+CoreSim.core.cpu.datapath.regs.\register[12][31:0]
+CoreSim.core.cpu.datapath.regs.\register[13][31:0]
+CoreSim.core.cpu.datapath.regs.\register[14][31:0]
+CoreSim.core.cpu.datapath.regs.\register[15][31:0]
+CoreSim.core.cpu.datapath.regs.\register[16][31:0]
+CoreSim.core.cpu.datapath.regs.\register[17][31:0]
+CoreSim.core.cpu.datapath.regs.\register[18][31:0]
+CoreSim.core.cpu.datapath.regs.\register[19][31:0]
+CoreSim.core.cpu.datapath.regs.\register[20][31:0]
+CoreSim.core.cpu.datapath.regs.\register[21][31:0]
+CoreSim.core.cpu.datapath.regs.\register[22][31:0]
+CoreSim.core.cpu.datapath.regs.\register[23][31:0]
+CoreSim.core.cpu.datapath.regs.\register[24][31:0]
+CoreSim.core.cpu.datapath.regs.\register[25][31:0]
+CoreSim.core.cpu.datapath.regs.\register[26][31:0]
+CoreSim.core.cpu.datapath.regs.\register[27][31:0]
+CoreSim.core.cpu.datapath.regs.\register[28][31:0]
+CoreSim.core.cpu.datapath.regs.\register[29][31:0]
+CoreSim.core.cpu.datapath.regs.\register[30][31:0]
+CoreSim.core.cpu.datapath.regs.\register[31][31:0]
+@1000200
+-registers
+@c00200
+-RAM
+@22
+CoreSim.core.ram_unit.\ram[0][31:0]
+CoreSim.core.ram_unit.\ram[1][31:0]
+CoreSim.core.ram_unit.\ram[2][31:0]
+CoreSim.core.ram_unit.\ram[36][31:0]
+CoreSim.core.ram_unit.\ram[37][31:0]
+CoreSim.core.ram_unit.\ram[38][31:0]
+CoreSim.core.ram_unit.\ram[39][31:0]
+CoreSim.core.ram_unit.\ram[256][31:0]
+CoreSim.core.ram_unit.\ram[257][31:0]
+CoreSim.core.ram_unit.\ram[258][31:0]
+@1401200
+-RAM
+[pattern_trace] 1
+[pattern_trace] 0

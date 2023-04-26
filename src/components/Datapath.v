@@ -10,14 +10,20 @@ module Datapath(
     input           b_type,     // 0 -> bne, 1 -> beq
     input           auipc,      // whether auipc or not
     input   [3:0]   alu_op,     // ALU operation
-    input   [1:0]   mem_to_reg, // 00 -> from ALU, 01 -> from imm, 10 -> from pc+4, 11 -> from RAM
+    input   [2:0]   mem_to_reg, // 00 -> from ALU, 01 -> from imm, 10 -> from pc+4, 11 -> from RAM
     input   [31:0]  inst_in,    // now instruction
     input   [31:0]  data_in,    // data from data memory
     output  [31:0]  addr_out,   // data memory address
     output  [31:0]  data_out,   // data to data memory
     output  [31:0]  pc_out,     // connect to instruction memory
     input   [4:0]   debug_reg_addr,
-    output  [31:0]  debug_reg
+    output  [31:0]  debug_reg,
+    input   [1:0]   trap,
+    input   [11:0]  csr_read_addr,
+    input   [11:0]  csr_write_addr,
+    input           csr_write,
+    input           csr_write_src,
+    input           rev_imm
 );
     reg     [31:0]  pc;
     wire    [31:0]  pc_next;
@@ -26,6 +32,7 @@ module Datapath(
     wire            alu_zero;
     wire    [31:0]  imm;
     wire    [31:0]  jal_addr, jalr_addr;
+    wire    [31:0]  csr_read_data, csr_write_data;
 
     assign pc_out   = pc;
     assign addr_out = alu_result;
@@ -52,6 +59,18 @@ module Datapath(
         .read_data_2(read_data_2),
         .debug_reg_addr(debug_reg_addr),
         .debug_reg(debug_reg)
+    );
+
+    CSRs csr (
+        .clk(clk),
+        .rst(rst),
+        .we(csr_write),
+        .trap(trap),
+        .pc(pc),
+        .csr_read_addr(csr_read_addr),
+        .csr_write_addr(csr_write_addr),
+        .csr_write_data(read_data_1),
+        .csr_read_data(csr_read_data)
     );
 
     ImmGen immgen (
@@ -81,11 +100,15 @@ module Datapath(
         .zero(alu_zero)
     );
 
-    Mux4x32 mux4x32 (
+    Mux8x32 mux8x32 (
         .I0(alu_result),
         .I1(imm),
         .I2(pc + 4),
         .I3(data_in),
+        .I4(csr_read_data),
+        .I5(0),
+        .I6(0),
+        .I7(0),
         .s(mem_to_reg),
         .o(write_data)
     );
@@ -97,7 +120,7 @@ module Datapath(
         .I0(pc + 4),
         .I1(jalr_addr),
         .I2(jal_addr),
-        .I3(jal_addr),
+        .I3(csr_read_data),
         .s(pc_src),
         .branch(branch),
         .b_type(b_type),

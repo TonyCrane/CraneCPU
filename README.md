@@ -9,7 +9,7 @@
 系统贯通课程会逐步实现一个 RISC-V 五级流水线 CPU，并实现异常处理、分支预测、Cache 等功能。本 repo 通过分支、tag 等来记录实验进度，保存各阶段成果。
 
 - [x] 系统 Ⅰ lab5-1/lab5-2：单周期 CPU
-- [ ] extra：单周期 CPU with 特权指令/异常处理
+- [x] extra：单周期 CPU with 特权指令/异常处理
 - [ ] 系统 Ⅱ lab1：流水线 CPU (stall)
 - [ ] 系统 Ⅱ lab2：流水线 CPU (forwarding)
 - [ ] 系统 Ⅱ lab7：流水线 CPU with 特权指令/异常处理

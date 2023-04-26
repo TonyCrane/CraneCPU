@@ -7,7 +7,7 @@ module ROM (
     reg [31:0] rom [0:2047];
 
     initial begin
-        $readmemh("tests/full.hex", rom);
+        $readmemh("tests/Priviledged/advance.hex", rom);
     end
 
     assign out = rom[address];

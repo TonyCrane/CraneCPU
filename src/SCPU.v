@@ -13,13 +13,18 @@ module SCPU(
     output  [31:0]  debug_reg
 );
     wire    [3:0]   alu_op;
-    wire    [1:0]   pc_src, mem_to_reg;
+    wire    [1:0]   pc_src;
+    wire    [2:0]   mem_to_reg;
     wire            reg_write, alu_src, branch, b_type, auipc;
+    wire    [1:0]   trap;
+    wire    [11:0]  csr_read_addr, csr_write_addr;
+    wire            csr_write, csr_write_src, rev_imm;
 
     Control control ( 
         .op_code(inst[6:0]),
         .funct3(inst[14:12]),
         .funct7_5(inst[30]),
+        .csr(inst[31:20]),
         .pc_src(pc_src),         // 2'b00 表示pc的数据来自pc+4, 2'b01 表示数据来自JALR跳转地址, 2'b10表示数据来自JAL跳转地址(包括branch). branch 跳转根据条件决定
         .reg_write(reg_write),   // 1'b1 表示写寄存器
         .alu_src_b(alu_src_b),   // 1'b1 表示ALU B口的数据源来自imm, 1'b0表示数据来自Reg[rs2]
@@ -28,7 +33,13 @@ module SCPU(
         .mem_write(mem_write),   // 1'b1 表示写data memory, 1'b0表示读data memory
         .branch(branch),         // 1'b1 表示是branch类型的指令
         .b_type(b_type),         // 1'b1 表示beq, 1'b0 表示bne
-        .auipc(auipc)
+        .auipc(auipc),
+        .trap(trap),
+        .csr_read_addr(csr_read_addr),
+        .csr_write_addr(csr_write_addr),
+        .csr_write(csr_write),
+        .csr_write_src(csr_write_src),
+        .rev_imm(rev_imm)
     );
 
     Datapath datapath (
@@ -48,7 +59,13 @@ module SCPU(
         .data_out(data_out),
         .pc_out(pc_out),
         .debug_reg_addr(debug_reg_addr),
-        .debug_reg(debug_reg)
+        .debug_reg(debug_reg),
+        .trap(trap),
+        .csr_read_addr(csr_read_addr),
+        .csr_write_addr(csr_write_addr),
+        .csr_write(csr_write),
+        .csr_write_src(csr_write_src),
+        .rev_imm(rev_imm)
     );
     
 endmodule
