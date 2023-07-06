@@ -1,17 +1,17 @@
 `timescale 1ns / 1ps
 
 module MuxPC(
-    input   [31:0]  I0,
-    input   [31:0]  I1,
-    input   [31:0]  I2,
-    input   [31:0]  I3,
+    input   [63:0]  I0,
+    input   [63:0]  I1,
+    input   [63:0]  I2,
+    input   [63:0]  I3,
     input   [1:0]   s,
     input           branch,
     input           b_type,     // 0 bne, 1 beq
-    input   [31:0]  alu_res,
-    output  [31:0]  o
+    input   [63:0]  alu_res,
+    output  [63:0]  o
 );
-    reg [31:0] out;
+    reg [63:0] out;
     always @(*) begin
         if (branch) begin
             if (b_type) begin

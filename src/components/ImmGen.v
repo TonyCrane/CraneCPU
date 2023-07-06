@@ -2,37 +2,26 @@
 
 module ImmGen(
     input   [31:0]  inst,
-    output  [31:0]  imm
+    output  [63:0]  imm
 );
     `include "Opcodes.vh"
     reg [3:0] type;
     reg [31:0] out;
-    assign imm = out;
+    assign imm = {{32{out[31]}}, out[31:0]};
 
     always @(*) begin
         case (inst[6:0])
-            LW:     type <= I;
-            SW:     type <= S;
-            ADDI:   type <= I;
-            BNE:    type <= B;
-            BEQ:    type <= B;
-            JAL:    type <= J;
-            LUI:    type <= U;
-            ADD:    type <= R;
-            SLT:    type <= R;
-            SLTI:   type <= I;
-            ANDI:   type <= I;
-            ORI:    type <= I;
-            AND:    type <= R;
-            OR:     type <= R;
-            SLL:    type <= R;
-            XORI:   type <= I;
-            SLLI:   type <= R;
-            SRLI:   type <= R;
-            SRL:    type <= R;
-            AUIPC:  type <= U;
-            SLTU:   type <= R;
-            JALR:   type <= I;
+            LUI:        type <= U;
+            AUIPC:      type <= U;
+            JAL:        type <= J;
+            BRANCH:     type <= B;
+            LOAD:       type <= I;
+            STORE:      type <= S;
+            OP_IMM:     type <= I;
+            OP:         type <= R;
+            SYSTEM:     type <= I;
+            OP_IMM_32:  type <= I;
+            OP_32:      type <= R;
         endcase
         case (type)
             R: out <= {{20{inst[31]}}, inst[31:20]};

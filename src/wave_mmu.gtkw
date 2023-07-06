@@ -1,0 +1,69 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*]
+[timestart] 0
+[size] 1792 998
+[pos] 0 0
+*-13.057517 9880 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] MMUSim.
+[treeopen] MMUSim.mmu.
+[treeopen] MMUSim.mmu.addr_trans.
+[sst_width] 250
+[signals_width] 317
+[sst_expanded] 1
+[sst_vpaned_height] 308
+@28
+MMUSim.clk
+MMUSim.rst
+@800200
+-MMU
+@22
+MMUSim.mmu.data_addr[63:0]
+MMUSim.mmu.satp[63:0]
+@28
+MMUSim.mmu.finish_translation
+MMUSim.mmu.stall_pipeline
+@1000200
+-MMU
+@800200
+-AddrTrans
+@22
+MMUSim.mmu.addr_trans.satp_mode[3:0]
+MMUSim.mmu.addr_trans.satp_ppn[43:0]
+@28
+MMUSim.mmu.addr_trans.trans_state2[1:0]
+MMUSim.mmu.addr_trans.next_state2[1:0]
+@22
+MMUSim.mmu.addr_trans.memory_addr2[63:0]
+MMUSim.mmu.addr_trans.memory_data2[63:0]
+MMUSim.mmu.addr_trans.vpn0_2[8:0]
+MMUSim.mmu.addr_trans.vpn1_2[8:0]
+MMUSim.mmu.addr_trans.vpn2_2[8:0]
+MMUSim.mmu.addr_trans.pte_PPN0_2[8:0]
+MMUSim.mmu.addr_trans.pte_PPN1_2[8:0]
+MMUSim.mmu.addr_trans.pte_PPN2_2[25:0]
+@28
+MMUSim.mmu.addr_trans.pte_X_2
+MMUSim.mmu.addr_trans.pte_W_2
+MMUSim.mmu.addr_trans.pte_V_2
+@22
+MMUSim.mmu.addr_trans.pgoff_2[11:0]
+@28
+MMUSim.mmu.addr_trans.finish
+@1000200
+-AddrTrans
+@800200
+-RAM
+@1000200
+-RAM
+@22
+MMUSim.mmu.memory.address2[63:0]
+MMUSim.mmu.memory.read_data2[63:0]
+@29
+MMUSim.mmu.memory.width2[2:0]
+@800200
+-ROM
+@1000200
+-ROM
+[pattern_trace] 1
+[pattern_trace] 0

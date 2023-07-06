@@ -5,41 +5,49 @@ module CSRs (
     input           rst,
     input           we,
     input   [1:0]   trap, // 00 no trap, 01 ecall, 10 unimp, 11 mret
-    input   [31:0]  pc,
+    input   [63:0]  pc,
     input   [11:0]  csr_read_addr,
     input   [11:0]  csr_write_addr,
-    input   [31:0]  csr_write_data,
-    output  [31:0]  csr_read_data
+    input   [63:0]  csr_write_data,
+    input   [63:0]  csr_write_scause,
+    output  [63:0]  csr_read_data,
+    output  [63:0]  csr_satp,
+    output  [63:0]  csr_sstatus
 );
-    reg [31:0] mstatus, mepc, mtvec, mcause;
+    reg [63:0] sstatus, sepc, stvec, scause, satp, sscratch;
     
-    assign csr_read_data = (csr_read_addr == 12'h300) ? mstatus :
-                           (csr_read_addr == 12'h341) ? mepc :
-                           (csr_read_addr == 12'h305) ? mtvec :
-                           (csr_read_addr == 12'h342) ? mcause : 0;
+    assign csr_read_data = (csr_read_addr == 12'h100) ? sstatus :
+                           (csr_read_addr == 12'h141) ? sepc :
+                           (csr_read_addr == 12'h105) ? stvec :
+                           (csr_read_addr == 12'h142) ? scause : 
+                           (csr_read_addr == 12'h180) ? satp : 
+                           (csr_read_addr == 12'h140) ? sscratch : 0;
+    assign csr_satp = satp;
+    assign csr_sstatus = sstatus;
     
     always @(negedge clk or posedge rst) begin
         if (rst == 1) begin
-            mstatus <= 0;
-            mepc <= 0;
-            mtvec <= 0;
-            mcause <= 0;
-        end
-        else if (trap != 0) begin
-            if (trap == 2'b01) begin
-                mepc <= pc;
-                mcause <= 11;
+            sstatus <= 0;
+            sepc <= 0;
+            stvec <= 64'h80200000;
+            scause <= 0;
+            satp <= 0;
+            sscratch <= 0;
+        end else begin
+            if (we == 1) begin
+                if      (csr_write_addr == 12'h100) sstatus <= csr_write_data;
+                else if (csr_write_addr == 12'h141) sepc <= csr_write_data;
+                else if (csr_write_addr == 12'h105) stvec <= csr_write_data;
+                else if (csr_write_addr == 12'h142) scause <= csr_write_data;
+                else if (csr_write_addr == 12'h180) satp <= csr_write_data;
+                else if (csr_write_addr == 12'h140) sscratch <= csr_write_data;
             end
-            else if (trap == 2'b10) begin
-                mepc <= pc;
-                mcause <= 2;
+            if (trap != 0) begin
+                if (trap == 2'b01 || trap == 2'b10) begin
+                    sepc <= pc;
+                    scause <= csr_write_scause;
+                end
             end
-        end
-        else if (we == 1) begin
-            if (csr_write_addr == 12'h300) mstatus <= csr_write_data;
-            else if (csr_write_addr == 12'h341) mepc <= csr_write_data;
-            else if (csr_write_addr == 12'h305) mtvec <= csr_write_data;
-            else if (csr_write_addr == 12'h342) mcause <= csr_write_data;
         end
     end
 endmodule

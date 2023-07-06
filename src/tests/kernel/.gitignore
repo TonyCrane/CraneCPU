@@ -1,0 +1,13 @@
+.DS_Store
+.gdb_history
+*.o
+gdb_changes.txt
+
+arch/riscv/boot/Image
+build/
+vmlinux
+vmlinux.asm
+System.map
+*.hex
+
+user/uapp.*

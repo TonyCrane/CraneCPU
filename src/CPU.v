@@ -3,235 +3,144 @@
 module CPU(
     input           clk,
     input           rst,
+    input           stall,
     input   [31:0]  inst,
-    input   [31:0]  data_in,  // data from data memory
+    input   [63:0]  data_in,  // data from data memory
     input   [4:0]   debug_reg_addr,
-    output  [31:0]  addr_out, // data memory address
-    output  [31:0]  data_out, // data to data memory
-    output  [31:0]  pc_out,   // connect to instruction memory
+    output  [63:0]  addr_out, // data memory address
+    output  [63:0]  data_out, // data to data memory
+    output  [63:0]  pc_out,   // connect to instruction memory
     output          mem_write,
-    output  [31:0]  debug_reg
+    output          mem_read,
+    output  [63:0]  debug_reg,
+    output  [63:0]  satp,
+    output  [2:0]   data_width
 );
-    reg     [31:0]  pc;
-    wire    [31:0]  pc_next;
+    reg     [63:0]  pc;
+    wire    [63:0]  pc_next;
     
-    reg     [31:0]  IF_ID_pc;
-    reg     [31:0]  IF_ID_inst;
+    wire    [63:0]  IF_ID_pc;
+    wire    [31:0]  IF_ID_inst;
 
-    wire    [31:0]  read_data1, read_data2, imm;
-    wire    [31:0]  csr_read_data, csr_ret_pc;
+    wire    [63:0]  read_data1, read_data2, imm;
+    wire    [63:0]  csr_read_data, csr_ret_pc;
+    wire    [63:0]  csr_write_scause, sstatus, csr_write_sstatus;
     wire    [11:0]  csr_read_addr, csr_write_addr;
     wire    [3:0]   alu_op;
     wire    [2:0]   mem_to_reg;
     wire    [1:0]   pc_src, trap;
     wire            alu_src;
     wire            reg_write, branch, b_type, auipc, mem_write_;
-    wire            mem_read, bubble_stop, jump;
+    wire            mem_read_, bubble_stop, jump;
     wire            csr_write, csr_write_src, rev_imm;
-    reg     [31:0]  ID_EX_data1, ID_EX_data2;
-    reg     [31:0]  ID_EX_pc, ID_EX_imm;
-    reg     [4:0]   ID_EX_rs1, ID_EX_rs2;
-    reg     [4:0]   ID_EX_write_addr;
-    reg     [3:0]   ID_EX_alu_op;
-    reg     [2:0]   ID_EX_mem_to_reg;
-    reg     [1:0]   ID_EX_pc_src;
-    reg             ID_EX_alu_src;
-    reg             ID_EX_reg_write, ID_EX_branch, ID_EX_b_type, ID_EX_auipc, ID_EX_mem_write;
-    reg             ID_EX_mem_read;
-    reg     [11:0]  ID_EX_csr_write_addr;
-    reg             ID_EX_csr_write, ID_EX_csr_write_src, ID_EX_rev_imm;
-    reg     [31:0]  ID_EX_csr_write_data, ID_EX_csr_read_data;
+    wire            alu_work_on_word;
+    wire    [2:0]   data_width_;
+    wire    [63:0]  ID_EX_data1, ID_EX_data2;
+    wire    [63:0]  ID_EX_pc, ID_EX_imm;
+    wire    [4:0]   ID_EX_rs1, ID_EX_rs2;
+    wire    [4:0]   ID_EX_write_addr;
+    wire    [3:0]   ID_EX_alu_op;
+    wire    [2:0]   ID_EX_mem_to_reg;
+    wire    [1:0]   ID_EX_pc_src;
+    wire            ID_EX_alu_src;
+    wire            ID_EX_reg_write, ID_EX_branch, ID_EX_b_type, ID_EX_auipc, ID_EX_mem_write;
+    wire            ID_EX_mem_read;
+    wire    [11:0]  ID_EX_csr_write_addr;
+    wire            ID_EX_csr_write, ID_EX_csr_write_src, ID_EX_rev_imm;
+    wire    [63:0]  ID_EX_csr_write_data, ID_EX_csr_read_data;
+    wire            ID_EX_alu_work_on_word;
+    wire    [2:0]   ID_EX_data_width;
 
-    wire    [31:0]  alu_data1, alu_data2, alu_result;
+    wire    [63:0]  alu_data1, alu_data2, alu_result;
     wire            alu_zero;
     wire    [2:0]   forwardA, forwardB;
     wire    [1:0]   forwardC;
-    wire    [31:0]  ex_mem_data2;
-    reg     [31:0]  EX_MEM_alu_result, EX_MEM_pc, EX_MEM_imm;
-    reg     [31:0]  EX_MEM_data2;
-    reg     [4:0]   EX_MEM_write_addr;
-    reg     [2:0]   EX_MEM_mem_to_reg;
-    reg     [1:0]   EX_MEM_pc_src;
-    reg             EX_MEM_reg_write, EX_MEM_branch, EX_MEM_b_type, EX_MEM_mem_write;
-    reg     [11:0]  EX_MEM_csr_write_addr;
-    reg             EX_MEM_csr_write, EX_MEM_csr_write_src, EX_MEM_rev_imm;
-    reg     [31:0]  EX_MEM_csr_write_data, EX_MEM_csr_read_data;
+    wire    [63:0]  ex_mem_data2;
+    wire    [63:0]  EX_MEM_alu_result, EX_MEM_pc, EX_MEM_imm;
+    wire    [63:0]  EX_MEM_data2;
+    wire    [4:0]   EX_MEM_write_addr;
+    wire    [2:0]   EX_MEM_mem_to_reg;
+    wire    [1:0]   EX_MEM_pc_src;
+    wire            EX_MEM_reg_write, EX_MEM_branch, EX_MEM_b_type, EX_MEM_mem_write, EX_MEM_mem_read;
+    wire    [11:0]  EX_MEM_csr_write_addr;
+    wire            EX_MEM_csr_write, EX_MEM_csr_write_src, EX_MEM_rev_imm;
+    wire    [63:0]  EX_MEM_csr_write_data, EX_MEM_csr_read_data;
+    wire    [2:0]   EX_MEM_data_width;
 
-    wire    [31:0]  write_data;
-    wire    [31:0]  jal_addr, jalr_addr;
-    reg     [31:0]  MEM_WB_data_in, MEM_WB_alu_result, MEM_WB_pc, MEM_WB_imm;
-    reg     [4:0]   MEM_WB_write_addr;
-    reg     [2:0]   MEM_WB_mem_to_reg;
-    reg             MEM_WB_reg_write;
-    reg     [11:0]  MEM_WB_csr_write_addr;
-    reg             MEM_WB_csr_write, MEM_WB_csr_write_src, MEM_WB_rev_imm;
-    reg     [31:0]  MEM_WB_csr_write_data, MEM_WB_csr_read_data;
+    wire    [63:0]  write_data;
+    wire    [63:0]  jal_addr, jalr_addr;
+    wire    [63:0]  MEM_WB_data_in, MEM_WB_alu_result, MEM_WB_pc, MEM_WB_imm;
+    wire    [4:0]   MEM_WB_write_addr;
+    wire    [2:0]   MEM_WB_mem_to_reg;
+    wire            MEM_WB_reg_write;
+    wire    [11:0]  MEM_WB_csr_write_addr;
+    wire            MEM_WB_csr_write, MEM_WB_csr_write_src, MEM_WB_rev_imm;
+    wire    [63:0]  MEM_WB_csr_write_data, MEM_WB_csr_read_data;
 
 
     assign pc_out = pc;
 
-    always @(posedge clk or posedge rst) begin 
+    reg             ID_EX_flush, IF_ID_en;
+
+
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
-            pc <= 32'b0;
-            IF_ID_pc <= 32'b0;
-            IF_ID_inst <= 32'b0;
-            ID_EX_pc <= 32'b0;
-            ID_EX_data1 <= 32'b0;
-            ID_EX_data2 <= 32'b0;
-            ID_EX_imm <= 32'b0;
-            ID_EX_write_addr <= 5'b0;
-            ID_EX_alu_op <= 4'b0;
-            ID_EX_pc_src <= 2'b0;
-            ID_EX_mem_to_reg <= 3'b0;
-            ID_EX_reg_write <= 1'b0;
-            ID_EX_alu_src <= 1'b0;
-            ID_EX_branch <= 1'b0;
-            ID_EX_b_type <= 1'b0;
-            ID_EX_auipc <= 1'b0;
-            ID_EX_mem_write <= 1'b0;
-            ID_EX_mem_read <= 1'b0;
-            ID_EX_rs1 <= 5'b0;
-            ID_EX_rs2 <= 5'b0;
-            ID_EX_csr_write_addr <= 12'b0;
-            ID_EX_csr_write <= 1'b0;
-            ID_EX_csr_write_src <= 1'b0;
-            ID_EX_rev_imm <= 1'b0;
-            ID_EX_csr_write_data <= 32'b0;
-            ID_EX_csr_read_data <= 32'b0;
-            ID_EX_rev_imm <= 1'b0;
-            EX_MEM_alu_result <= 32'b0;
-            EX_MEM_pc <= 32'b0;
-            EX_MEM_imm <= 32'b0;
-            EX_MEM_data2 <= 32'b0;
-            EX_MEM_write_addr <= 5'b0;
-            EX_MEM_pc_src <= 2'b0;
-            EX_MEM_mem_to_reg <= 3'b0;
-            EX_MEM_reg_write <= 1'b0;
-            EX_MEM_branch <= 1'b0;
-            EX_MEM_b_type <= 1'b0;
-            EX_MEM_mem_write <= 1'b0;
-            EX_MEM_csr_write_addr <= 12'b0;
-            EX_MEM_csr_write <= 1'b0;
-            EX_MEM_csr_write_src <= 1'b0;
-            EX_MEM_rev_imm <= 1'b0;
-            EX_MEM_csr_write_data <= 32'b0;
-            EX_MEM_csr_read_data <= 32'b0;
-            MEM_WB_data_in <= 32'b0;
-            MEM_WB_alu_result <= 32'b0;
-            MEM_WB_pc <= 32'b0;
-            MEM_WB_imm <= 32'b0;
-            MEM_WB_write_addr <= 5'b0;
-            MEM_WB_mem_to_reg <= 3'b0;
-            MEM_WB_reg_write <= 1'b0;
-            MEM_WB_csr_write_addr <= 12'b0;
-            MEM_WB_csr_write <= 1'b0;
-            MEM_WB_csr_write_src <= 1'b0;
-            MEM_WB_rev_imm <= 1'b0;
-            MEM_WB_csr_write_data <= 32'b0;
-            MEM_WB_csr_read_data <= 32'b0;
-        end
-        else begin 
-            if (bubble_stop) begin
-                ID_EX_alu_op <= 4'b0;
-                ID_EX_pc_src <= 2'b0;
-                ID_EX_mem_to_reg <= 3'b0;
-                ID_EX_reg_write <= 1'b0;
-                ID_EX_alu_src <= 1'b0;
-                ID_EX_branch <= 1'b0;
-                ID_EX_b_type <= 1'b0;
-                ID_EX_auipc <= 1'b0;
-                ID_EX_mem_write <= 1'b0;
-                ID_EX_mem_read <= 1'b0;
-                ID_EX_csr_write_addr <= 12'b0;
-                ID_EX_csr_write <= 1'b0;
-                ID_EX_csr_write_src <= 1'b0;
-                ID_EX_rev_imm <= 1'b0;
-            end else if (jump || trap != 2'b0) begin
-                pc <= pc_next;
-
-                IF_ID_pc <= pc;
-                IF_ID_inst <= 32'h00000013;
-                
-                ID_EX_pc_src <= pc_src;
-                ID_EX_mem_to_reg <= mem_to_reg;
-                ID_EX_reg_write <= reg_write;
-                ID_EX_alu_src <= alu_src;
-                ID_EX_branch <= branch;
-                ID_EX_b_type <= b_type;
-                ID_EX_auipc <= auipc;
-                ID_EX_alu_op <= alu_op;
-                ID_EX_mem_write <= mem_write_;
-                ID_EX_mem_read <= mem_read;
-                ID_EX_csr_write_addr <= csr_write_addr;
-                ID_EX_csr_write <= csr_write;
-                ID_EX_csr_write_src <= csr_write_src;
-                ID_EX_rev_imm <= rev_imm;
-            end else begin 
-                pc <= pc_next;
-
-                IF_ID_pc <= pc;
-                IF_ID_inst <= inst;
-
-                ID_EX_pc_src <= pc_src;
-                ID_EX_mem_to_reg <= mem_to_reg;
-                ID_EX_reg_write <= reg_write;
-                ID_EX_alu_src <= alu_src;
-                ID_EX_branch <= branch;
-                ID_EX_b_type <= b_type;
-                ID_EX_auipc <= auipc;
-                ID_EX_alu_op <= alu_op;
-                ID_EX_mem_write <= mem_write_;
-                ID_EX_mem_read <= mem_read;
-                ID_EX_csr_write_addr <= csr_write_addr;
-                ID_EX_csr_write <= csr_write;
-                ID_EX_csr_write_src <= csr_write_src;
-                ID_EX_rev_imm <= rev_imm;
-            end
-            
-            ID_EX_pc <= IF_ID_pc;
-            ID_EX_data1 <= read_data1;
-            ID_EX_data2 <= read_data2;
-            ID_EX_imm <= imm;
-            ID_EX_write_addr <= IF_ID_inst[11:7];
-            ID_EX_rs1 <= IF_ID_inst[19:15];
-            ID_EX_rs2 <= IF_ID_inst[24:20];
-            ID_EX_csr_write_data <= read_data1;
-            ID_EX_csr_read_data <= csr_read_data;
-
-            EX_MEM_pc <= ID_EX_pc;
-            EX_MEM_imm <= ID_EX_imm;
-            EX_MEM_data2 <= ex_mem_data2;
-            EX_MEM_alu_result <= alu_result;
-            EX_MEM_write_addr <= ID_EX_write_addr;
-            EX_MEM_pc_src <= ID_EX_pc_src;
-            EX_MEM_mem_to_reg <= ID_EX_mem_to_reg;
-            EX_MEM_reg_write <= ID_EX_reg_write;
-            EX_MEM_branch <= ID_EX_branch;
-            EX_MEM_b_type <= ID_EX_b_type;
-            EX_MEM_mem_write <= ID_EX_mem_write;
-            EX_MEM_csr_write_addr <= ID_EX_csr_write_addr;
-            EX_MEM_csr_write <= ID_EX_csr_write;
-            EX_MEM_csr_write_src <= ID_EX_csr_write_src;
-            EX_MEM_rev_imm <= ID_EX_rev_imm;
-            EX_MEM_csr_write_data <= alu_data1;
-            EX_MEM_csr_read_data <= ID_EX_csr_read_data;
-
-            MEM_WB_data_in <= data_in;
-            MEM_WB_alu_result <= EX_MEM_alu_result;
-            MEM_WB_pc <= EX_MEM_pc;
-            MEM_WB_imm <= EX_MEM_imm;
-            MEM_WB_write_addr <= EX_MEM_write_addr;
-            MEM_WB_mem_to_reg <= EX_MEM_mem_to_reg;
-            MEM_WB_reg_write <= EX_MEM_reg_write;
-            MEM_WB_csr_write_addr <= EX_MEM_csr_write_addr;
-            MEM_WB_csr_write <= EX_MEM_csr_write;
-            MEM_WB_csr_write_src <= EX_MEM_csr_write_src;
-            MEM_WB_rev_imm <= EX_MEM_rev_imm;
-            MEM_WB_csr_write_data <= EX_MEM_csr_write_data;
-            MEM_WB_csr_read_data <= EX_MEM_csr_read_data;
-
+            pc <= 64'h80200000;
+        end else if (~bubble_stop && ~stall) begin
+            pc <= pc_next;
         end
     end
+
+    RegIFID reg_IFID (
+        .clk(clk), .rst(rst), .en(~stall),
+        .stall(bubble_stop), .flush(jump || trap != 2'b0),
+        .pc_IF(pc), .inst_IF(inst),
+        .pc_ID(IF_ID_pc), .inst_ID(IF_ID_inst)
+    );
+
+    RegIDEX reg_IDEX (
+        .clk(clk), .rst(rst), .en(~stall),
+        .flush(bubble_stop),
+        .pc_ID(IF_ID_pc), .pc_src_ID(pc_src), .rs1_ID(IF_ID_inst[19:15]), .rs2_ID(IF_ID_inst[24:20]), .rd_ID(IF_ID_inst[11:7]),
+        .data1_ID(read_data1), .data2_ID(read_data2), .imm_ID(imm),
+        .alu_op_ID(alu_op), .alu_src_ID(alu_src), .alu_work_on_word_ID(alu_work_on_word),
+        .reg_write_ID(reg_write), .mem_to_reg_ID(mem_to_reg), .mem_read_ID(mem_read_), .mem_write_ID(mem_write_), .data_width_ID(data_width_),
+        .branch_ID(branch), .b_type_ID(b_type), .auipc_ID(auipc),
+        .csr_write_ID(csr_write), .csr_write_src_ID(csr_write_src), .csr_rd_ID(csr_write_addr), .csr_write_data_ID(read_data1), .csr_read_data_ID(csr_read_data),
+
+        .pc_EX(ID_EX_pc), .pc_src_EX(ID_EX_pc_src), .rs1_EX(ID_EX_rs1), .rs2_EX(ID_EX_rs2), .rd_EX(ID_EX_write_addr),
+        .data1_EX(ID_EX_data1), .data2_EX(ID_EX_data2), .imm_EX(ID_EX_imm),
+        .alu_op_EX(ID_EX_alu_op), .alu_src_EX(ID_EX_alu_src), .alu_work_on_word_EX(ID_EX_alu_work_on_word),
+        .reg_write_EX(ID_EX_reg_write), .mem_to_reg_EX(ID_EX_mem_to_reg), .mem_read_EX(ID_EX_mem_read), .mem_write_EX(ID_EX_mem_write), .data_width_EX(ID_EX_data_width),
+        .branch_EX(ID_EX_branch), .b_type_EX(ID_EX_b_type), .auipc_EX(ID_EX_auipc),
+        .csr_write_EX(ID_EX_csr_write), .csr_write_src_EX(ID_EX_csr_write_src), .csr_rd_EX(ID_EX_csr_write_addr), .csr_write_data_EX(ID_EX_csr_write_data), .csr_read_data_EX(ID_EX_csr_read_data)
+    );
+
+    RegEXMEM reg_EXMEM (
+        .clk(clk), .rst(rst), .en(~stall),
+        .pc_EX(ID_EX_pc), .pc_src_EX(ID_EX_pc_src),
+        .rd_EX(ID_EX_write_addr), .data2_EX(ex_mem_data2), .imm_EX(ID_EX_imm), .alu_result_EX(alu_result),
+        .mem_to_reg_EX(ID_EX_mem_to_reg), .reg_write_EX(ID_EX_reg_write), .mem_write_EX(ID_EX_mem_write), .mem_read_EX(ID_EX_mem_read), .data_width_EX(ID_EX_data_width),
+        .branch_EX(ID_EX_branch), .b_type_EX(ID_EX_b_type),
+        .csr_rd_EX(ID_EX_csr_write_addr), .csr_write_EX(ID_EX_csr_write), .csr_write_src_EX(ID_EX_csr_write_src), .csr_write_data_EX(csr_write_src ? csr_write_sstatus : alu_data1), .csr_read_data_EX(ID_EX_csr_read_data),
+
+        .pc_MEM(EX_MEM_pc), .pc_src_MEM(EX_MEM_pc_src),
+        .rd_MEM(EX_MEM_write_addr), .data2_MEM(EX_MEM_data2), .imm_MEM(EX_MEM_imm), .alu_result_MEM(EX_MEM_alu_result),
+        .mem_to_reg_MEM(EX_MEM_mem_to_reg), .reg_write_MEM(EX_MEM_reg_write), .mem_write_MEM(EX_MEM_mem_write), .mem_read_MEM(EX_MEM_mem_read), .data_width_MEM(EX_MEM_data_width),
+        .branch_MEM(EX_MEM_branch), .b_type_MEM(EX_MEM_b_type),
+        .csr_rd_MEM(EX_MEM_csr_write_addr), .csr_write_MEM(EX_MEM_csr_write), .csr_write_src_MEM(EX_MEM_csr_write_src), .csr_write_data_MEM(EX_MEM_csr_write_data), .csr_read_data_MEM(EX_MEM_csr_read_data)
+    );
+
+    RegMEMWB reg_MEM_WB (
+        .clk(clk), .rst(rst), .en(~stall),
+        .pc_MEM(EX_MEM_pc), .imm_MEM(EX_MEM_imm), .alu_result_MEM(EX_MEM_alu_result), .data_in_MEM(data_in),
+        .rd_MEM(EX_MEM_write_addr), .mem_to_reg_MEM(EX_MEM_mem_to_reg), .reg_write_MEM(EX_MEM_reg_write),
+        .csr_rd_MEM(EX_MEM_csr_write_addr), .csr_write_MEM(EX_MEM_csr_write), .csr_write_src_MEM(EX_MEM_csr_write_src), .csr_write_data_MEM(EX_MEM_csr_write_data), .csr_read_data_MEM(EX_MEM_csr_read_data),
+
+        .pc_WB(MEM_WB_pc), .imm_WB(MEM_WB_imm), .alu_result_WB(MEM_WB_alu_result), .data_in_WB(MEM_WB_data_in),
+        .rd_WB(MEM_WB_write_addr), .mem_to_reg_WB(MEM_WB_mem_to_reg), .reg_write_WB(MEM_WB_reg_write),
+        .csr_rd_WB(MEM_WB_csr_write_addr), .csr_write_WB(MEM_WB_csr_write), .csr_write_src_WB(MEM_WB_csr_write_src), .csr_write_data_WB(MEM_WB_csr_write_data), .csr_read_data_WB(MEM_WB_csr_read_data)
+    );
 
 //--------------------ID--------------------//
 
@@ -246,10 +155,15 @@ module CPU(
     );
 
     assign jal_addr = IF_ID_pc + imm;
-    wire    [31:0]  reg1, reg2;
-    assign reg1 = (jump && EX_MEM_reg_write && (EX_MEM_write_addr != 0) && (EX_MEM_write_addr == IF_ID_inst[19:15])) ? (EX_MEM_mem_to_reg == 2'b11 ? data_in : EX_MEM_alu_result) : read_data1;
-    assign reg2 = (jump && EX_MEM_reg_write && (EX_MEM_write_addr != 0) && (EX_MEM_write_addr == IF_ID_inst[24:20])) ? (EX_MEM_mem_to_reg == 2'b11 ? data_in : EX_MEM_alu_result) : read_data2;
+    wire    [63:0]  reg1, reg2;
+    assign reg1 = (jump && EX_MEM_reg_write && (EX_MEM_write_addr != 0) && (EX_MEM_write_addr == IF_ID_inst[19:15])) ? (EX_MEM_mem_to_reg == 3'b011 ? data_in : EX_MEM_alu_result) : read_data1;
+    assign reg2 = (jump && EX_MEM_reg_write && (EX_MEM_write_addr != 0) && (EX_MEM_write_addr == IF_ID_inst[24:20])) ? (EX_MEM_mem_to_reg == 3'b011 ? data_in : EX_MEM_alu_result) : read_data2;
     assign jalr_addr = reg1 + reg2;
+    wire    [63:0]  alu_res_tmp;
+    assign alu_res_tmp = 
+        (alu_op == 4'b0100) ? (reg1 ^ reg2) :
+        (alu_op == 4'b0011) ? (reg1 < reg2) :
+        ($signed(reg1) < $signed(reg2));
 
     MuxPC mux_pc (
         .I0(jump ? pc : pc + 4),
@@ -259,7 +173,7 @@ module CPU(
         .s(pc_src),
         .branch(branch),
         .b_type(b_type),
-        .alu_res(reg1 ^ reg2),
+        .alu_res(alu_res_tmp),
         .o(pc_next)
     );
 
@@ -277,28 +191,33 @@ module CPU(
         .debug_reg(debug_reg)
     );
 
+    wire set_satp;
+    assign set_satp = EX_MEM_csr_write && (EX_MEM_csr_write_addr == 12'h180);
+
     CSRs csrs (
         .clk(clk),
         .rst(rst),
-        .we(MEM_WB_csr_write),
+        .we(set_satp ? EX_MEM_csr_write : MEM_WB_csr_write),
         .trap(trap),
         .pc(IF_ID_pc),
         .csr_read_addr(csr_read_addr),
-        .csr_write_addr(MEM_WB_csr_write_addr),
-        .csr_write_data(MEM_WB_csr_write_data),
-        .csr_read_data(csr_read_data)
+        .csr_write_addr(set_satp ? EX_MEM_csr_write_addr : MEM_WB_csr_write_addr),
+        .csr_write_data(set_satp ? EX_MEM_csr_write_data : MEM_WB_csr_write_data),
+        .csr_write_scause(csr_write_scause),
+        .csr_read_data(csr_read_data),
+        .csr_satp(satp),
+        .csr_sstatus(sstatus)
     );
 
-    MretForwarding mretforwarding (
+    CSRReturnForwarding csrretforwarding (
         .ID_EX_csr_write(ID_EX_csr_write),
         .ID_EX_csr_write_addr(ID_EX_csr_write_addr),
-        // .ID_EX_csr_write_data(ID_EX_csr_write_data),
-        // .EX_MEM_csr_write(EX_MEM_csr_write),
-        // .EX_MEM_csr_write_addr(EX_MEM_csr_write_addr),
-        // .EX_MEM_csr_write_data(EX_MEM_csr_write_data),
+        .ID_EX_csr_write_data(ID_EX_csr_write_data),
         .EX_MEM_alu_result(EX_MEM_alu_result),
         .csr_read_data(csr_read_data),
         .trap(trap),
+        .EX_MEM_rd(EX_MEM_write_addr),
+        .ID_EX_rs1(ID_EX_rs1),
         .csr_ret_pc(csr_ret_pc)
     );
 
@@ -307,6 +226,8 @@ module CPU(
         .funct3(IF_ID_inst[14:12]),
         .funct7_5(IF_ID_inst[30]),
         .csr(IF_ID_inst[31:20]),
+        .pc(IF_ID_pc),
+        .sstatus(sstatus),
         .pc_src(pc_src),
         .reg_write(reg_write),
         .alu_src_b(alu_src),
@@ -316,14 +237,18 @@ module CPU(
         .branch(branch),
         .b_type(b_type),
         .auipc(auipc),
-        .mem_read(mem_read),
+        .mem_read(mem_read_),
         .jump(jump),
         .trap(trap),
         .csr_read_addr(csr_read_addr),
         .csr_write_addr(csr_write_addr),
         .csr_write(csr_write),
         .csr_write_src(csr_write_src),
-        .rev_imm(rev_imm)
+        .csr_write_sstatus(csr_write_sstatus),
+        .csr_write_scause(csr_write_scause),
+        .rev_imm(rev_imm),
+        .alu_work_on_word(alu_work_on_word),
+        .data_width(data_width_)
     );
 
     ImmGen immgen (
@@ -349,7 +274,7 @@ module CPU(
         .ForwardC(forwardC)
     );
 
-    Mux8x32 mux_alu_a (
+    Mux8x64 mux_alu_a (
         .I0(ID_EX_data1),
         .I1(EX_MEM_alu_result),
         .I2(write_data),
@@ -362,10 +287,10 @@ module CPU(
         .o(alu_data1)
     );
 
-    wire    [31:0]  alu_b_imm;
+    wire    [63:0]  alu_b_imm;
     assign alu_b_imm = (ID_EX_mem_to_reg == 3'b100 ? ID_EX_csr_read_data : ID_EX_imm);
 
-    Mux8x32 mux_alu_b (
+    Mux8x64 mux_alu_b (
         .I0(ID_EX_data2),
         .I1(EX_MEM_alu_result),
         .I2(write_data),
@@ -382,15 +307,16 @@ module CPU(
         .a(alu_data1),
         .b(alu_data2),
         .alu_op(ID_EX_alu_op),
+        .alu_work_on_word(ID_EX_alu_work_on_word),
         .res(alu_result),
         .zero(alu_zero)
     );
 
-    Mux4x32 mux_data2 (
+    Mux4x64 mux_data2 (
         .I0(ID_EX_data2),
         .I1(EX_MEM_alu_result),
         .I2(write_data),
-        .I3(32'h00000000),
+        .I3(64'h00000000),
         .s(forwardC),
         .o(ex_mem_data2)
     );
@@ -399,26 +325,20 @@ module CPU(
     assign addr_out = EX_MEM_alu_result;
     assign data_out = EX_MEM_data2;
     assign mem_write = EX_MEM_mem_write;
+    assign mem_read = EX_MEM_mem_read;
+    assign data_width = EX_MEM_data_width;
 
 //--------------------WB--------------------//
 
-    // Mux4x32 mux4x32 (
-    //     .I0(MEM_WB_alu_result),
-    //     .I1(MEM_WB_imm),
-    //     .I2(MEM_WB_pc + 4),
-    //     .I3(MEM_WB_data_in),
-    //     .s(MEM_WB_mem_to_reg),
-    //     .o(write_data)
-    // );
-    Mux8x32 mux8x32 (
+    Mux8x64 mux8x64 (
         .I0(MEM_WB_alu_result),
         .I1(MEM_WB_imm),
         .I2(MEM_WB_pc + 4),
         .I3(MEM_WB_data_in),
         .I4(MEM_WB_csr_read_data),
-        .I5(0),
-        .I6(0),
-        .I7(0),
+        .I5(64'b0),
+        .I6(64'b0),
+        .I7(64'b0),
         .s(MEM_WB_mem_to_reg),
         .o(write_data)
     );

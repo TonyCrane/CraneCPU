@@ -6,7 +6,9 @@
 
 ## 实验进度
 
-系统贯通课程会逐步实现一个 RISC-V 五级流水线 CPU，并实现异常处理、分支预测、Cache 等功能。本 repo 通过分支、tag 等来记录实验进度，保存各阶段成果。
+系统贯通课程会逐步实现一个 RISC-V 五级流水线 CPU，并实现异常处理、分支预测、Cache、MMU 等功能，并在其上运行自己编写的简易 kernel。
+
+本 repo 通过分支、tag 等来记录实验进度，保存各阶段成果。
 
 - [x] 系统 Ⅰ lab5-1/lab5-2：单周期 CPU
 - [x] extra：单周期 CPU with 特权指令/异常处理
@@ -18,6 +20,12 @@
     - 使用了提供的实验框架而非自己的，就不放在 repo 里了
 - [x] 系统 Ⅲ lab2：流水线 CPU with Cache
     - 使用了提供的实验框架而非自己的，就不放在 repo 里了
+- [x] 系统 Ⅲ lab Xpart：软硬件贯通实验，主要部分是实现 MMU 以及调试 kernel
+    - RV64IZicsr 全部指令（除去 fence ebreak wfi）
+    - 包含 Supervisor 和 User 两个特权级
+    - 实现了 Bare 和 Sv39 两种分页模式
+    - 支持串口输出
+    - 展示 slides 在：[slides.tonycrane.cc/sys3-xpart-pre](https://slides.tonycrane.cc/sys3-xpart-pre/)
 
 ## 实验环境
 

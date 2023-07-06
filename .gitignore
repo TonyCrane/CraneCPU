@@ -2,3 +2,5 @@
 
 src/core.vvp
 src/dump.vcd
+
+src/dut_changes.txt
